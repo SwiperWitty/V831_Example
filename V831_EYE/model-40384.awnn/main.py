@@ -5,7 +5,8 @@ input_size = (224, 224)
 model = "model-40384.awnn.mud"
 labels = ['bi', 'kai']
 anchors = [0.91, 0.77, 5.64, 4.16, 2.66, 2.25, 1.53, 1.28, 0.63, 0.53]
-
+Class_Color = (255, 255, 255)
+Color = (255, 255, 255)
 class YOLOv2:
     def __init__(self, model_path, labels, anchors, net_in_size, net_out_size):
         self.labels = labels
@@ -29,8 +30,17 @@ class YOLOv2:
             class_id = probs[i][0]
             prob = probs[i][1][class_id]
             msg = "{}:{:.2f}%".format(self.labels[class_id], prob*100)
-            img.draw_rectangle(box[0], box[1], box[0] + box[2], box[1] + box[3], color=(255, 255, 255), thickness=2)
-            img.draw_string(box[0] + 2, box[1] + 2, msg, scale = 1.2, color = (255, 255, 255), thickness = 2)
+            if prob*100 > 60 :
+                Color = (0, 255, 0)
+            else :
+                Color = (0, 0, 255)
+            if ('kai' in self.labels[class_id]) :
+                Class_Color = (0, 200, 100)
+            else :
+                Class_Color = (200, 0, 100)
+
+            img.draw_string(box[0] + 2, box[1] + 2, msg, scale = 1.2, color=Color, thickness = 2)
+            img.draw_rectangle(box[0], box[1], box[0] + box[2], box[1] + box[3], color=Class_Color, thickness=2)
 
 def main():
     camera.config(size=input_size)
@@ -49,6 +59,7 @@ if __name__ == "__main__":
         msg = traceback.format_exc()
         print(msg)
         img = image.new(size = (240, 240), color = (255, 0, 0), mode = "RGB")
-        img.draw_string(0, 0, msg, scale = 0.8, color = (255, 255, 255), thickness = 1)
+        img.draw_string(0, 0, msg, scale = 0.8, color = Color, thickness = 1)
+
         display.show(img)
-        time.sleep(20)
+        time.sleep(2)
